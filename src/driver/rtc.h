@@ -79,3 +79,4 @@ int rtc_get_clock_log_str(char *buffer, int size);
  */
 int rtc_date2str_date(const struct rtc_date *rd, char *buffer, int size);
 int rtc_date2str_time(const struct rtc_date *rd, char *buffer, int size);
+int rtc_date2str_ampm(const struct rtc_date *rd, char *buffer, int size);

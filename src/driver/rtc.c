@@ -136,21 +136,28 @@ int rtc_date2str_date(const struct rtc_date *rd, char *buffer, int size) {
 }
 int rtc_date2str_time(const struct rtc_date *rd, char *buffer, int size) {
     int hour = rd->hour;
-    char *ampm = "";
 
     if (g_setting.clock.format_ampm24 == 0) {
         if (hour > 12) {
             hour -= 12;
         }
         hour = hour == 0 ? 12 : hour;
-        ampm = (rd->hour > 11 ? " PM" : " AM");
     }
     
-
     if (g_setting.clock.format_time == 0)
-        return snprintf(buffer, size, "%02d:%02d:%02d%s", hour, rd->min, rd->sec, ampm);
+        return snprintf(buffer, size, "%02d:%02d:%02d", hour, rd->min, rd->sec);
     else
-        return snprintf(buffer, size, "%02d:%02d%s", hour, rd->min, ampm);
+        return snprintf(buffer, size, "%02d:%02d", hour, rd->min);
+}
+
+int rtc_date2str_ampm(const struct rtc_date *rd, char *buffer, int size) {
+    int hour = rd->hour;
+    char *ampm = "";
+
+    if (g_setting.clock.format_ampm24 == 0) {
+        ampm = (rd->hour > 11 ? " PM" : " AM");
+    }    
+    return snprintf(buffer, size, "%s", ampm);
 }
 
 /**

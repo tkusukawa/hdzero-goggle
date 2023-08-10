@@ -59,6 +59,7 @@ typedef struct {
 typedef struct {
     lv_obj_t *date;
     lv_obj_t *time;
+    lv_obj_t *ampm;
 } date_time_t;
 
 /**
@@ -181,6 +182,8 @@ static void page_clock_create_datetime_item(lv_obj_t *parent, int row) {
     lv_obj_set_style_pad_left(page_clock_datetime.date, 0, 0);
     page_clock_datetime.time = page_clock_create_datetime_item_attr(parent, row);
     lv_obj_set_style_pad_left(page_clock_datetime.time, 100, 0);
+    page_clock_datetime.ampm = page_clock_create_datetime_item_attr(parent, row);
+    lv_obj_set_style_pad_left(page_clock_datetime.ampm, 170, 0);
 }
 
 /**
@@ -189,6 +192,7 @@ static void page_clock_create_datetime_item(lv_obj_t *parent, int row) {
 static void page_clock_clear_datetime() {
     lv_label_set_text(page_clock_datetime.date, "");
     lv_label_set_text(page_clock_datetime.time, "");
+    lv_label_set_text(page_clock_datetime.ampm, "");
 }
 
 /**
@@ -203,6 +207,8 @@ static void page_clock_refresh_datetime() {
     lv_label_set_text(page_clock_datetime.date, text);
     rtc_date2str_time(&rd, text, sizeof(text));
     lv_label_set_text(page_clock_datetime.time, text);
+    rtc_date2str_ampm(&rd, text, sizeof(text));
+    lv_label_set_text(page_clock_datetime.ampm, text);
 }
 
 /**

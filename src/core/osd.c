@@ -177,6 +177,7 @@ void osd_clock_date_show(bool bShow, const struct rtc_date *rd) {
 void osd_clock_time_show(bool bShow, const struct rtc_date *rd) {
     if (!bShow || !g_setting.osd.element[OSD_GOGGLE_CLOCK_TIME].show) {
         lv_obj_add_flag(g_osd_hdzero.clock_time[is_fhd], LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(g_osd_hdzero.clock_ampm[is_fhd], LV_OBJ_FLAG_HIDDEN);
         return;
     }
 
@@ -185,6 +186,11 @@ void osd_clock_time_show(bool bShow, const struct rtc_date *rd) {
     lv_label_set_text(g_osd_hdzero.clock_time[is_fhd], buf);
     lv_obj_set_style_text_color(g_osd_hdzero.clock_time[is_fhd], lv_color_make(255, 255, 255), 0);
     lv_obj_clear_flag(g_osd_hdzero.clock_time[is_fhd], LV_OBJ_FLAG_HIDDEN);
+
+    rtc_date2str_ampm(rd, buf, sizeof(buf));
+    lv_label_set_text(g_osd_hdzero.clock_ampm[is_fhd], buf);
+    lv_obj_set_style_text_color(g_osd_hdzero.clock_ampm[is_fhd], lv_color_make(255, 255, 255), 0);
+    lv_obj_clear_flag(g_osd_hdzero.clock_ampm[is_fhd], LV_OBJ_FLAG_HIDDEN);
 }
 
 void osd_topfan_show(bool bShow) {
@@ -395,6 +401,11 @@ void osd_show_all_elements() {
         lv_obj_clear_flag(g_osd_hdzero.clock_date[is_fhd], LV_OBJ_FLAG_HIDDEN);
     else
         lv_obj_add_flag(g_osd_hdzero.clock_date[is_fhd], LV_OBJ_FLAG_HIDDEN);
+
+    if (g_setting.osd.element[OSD_GOGGLE_CLOCK_DATE].show)
+        lv_obj_clear_flag(g_osd_hdzero.clock_ampm[is_fhd], LV_OBJ_FLAG_HIDDEN);
+    else
+        lv_obj_add_flag(g_osd_hdzero.clock_ampm[is_fhd], LV_OBJ_FLAG_HIDDEN);
 
     if (g_setting.osd.element[OSD_GOGGLE_CLOCK_TIME].show)
         lv_obj_clear_flag(g_osd_hdzero.clock_time[is_fhd], LV_OBJ_FLAG_HIDDEN);
@@ -659,8 +670,15 @@ static void embedded_osd_init(uint8_t fhd) {
     osd_object_create_label(fhd, &g_osd_hdzero.clock_date[fhd], "2023-07-30", &g_setting.osd.element[OSD_GOGGLE_CLOCK_DATE].position, so);
     lv_obj_set_style_bg_color(g_osd_hdzero.clock_date[fhd], lv_color_hex(0x010101), LV_PART_MAIN);
 
-    osd_object_create_label(fhd, &g_osd_hdzero.clock_time[fhd], "14:50:23", &g_setting.osd.element[OSD_GOGGLE_CLOCK_TIME].position, so);
+    osd_object_create_label(fhd, &g_osd_hdzero.clock_time[fhd], "02:50:23", &g_setting.osd.element[OSD_GOGGLE_CLOCK_TIME].position, so);
     lv_obj_set_style_bg_color(g_osd_hdzero.clock_time[fhd], lv_color_hex(0x010101), LV_PART_MAIN);
+
+    setting_osd_goggle_element_positions_t pos;
+    pos = g_setting.osd.element[OSD_GOGGLE_CLOCK_TIME].position;
+    pos.mode_4_3.x += 140;
+    pos.mode_16_9.x += 140;
+    osd_object_create_label(fhd, &g_osd_hdzero.clock_ampm[fhd], "PM", &pos, so);
+    lv_obj_set_style_bg_color(g_osd_hdzero.clock_ampm[fhd], lv_color_hex(0x010101), LV_PART_MAIN);
 
     osd_resource_path(buf, "%s", is_fhd, VrxTemp7_gif);
     osd_object_create_gif(fhd, &g_osd_hdzero.vrx_temp[fhd], buf, &g_setting.osd.element[OSD_GOGGLE_VRX_TEMP].position, so);
@@ -699,6 +717,13 @@ void osd_update_element_positions() {
     osd_object_set_pos(is_fhd, g_osd_hdzero.battery_voltage[is_fhd], &g_setting.osd.element[OSD_GOGGLE_BATTERY_VOLTAGE].position);
     osd_object_set_pos(is_fhd, g_osd_hdzero.clock_date[is_fhd], &g_setting.osd.element[OSD_GOGGLE_CLOCK_DATE].position);
     osd_object_set_pos(is_fhd, g_osd_hdzero.clock_time[is_fhd], &g_setting.osd.element[OSD_GOGGLE_CLOCK_TIME].position);
+
+    setting_osd_goggle_element_positions_t pos;
+    pos = g_setting.osd.element[OSD_GOGGLE_CLOCK_TIME].position;
+    pos.mode_4_3.x += 140;
+    pos.mode_16_9.x += 140;
+    osd_object_set_pos(is_fhd, g_osd_hdzero.clock_ampm[is_fhd], &pos);
+
     osd_object_set_pos(is_fhd, g_osd_hdzero.vrx_temp[is_fhd], &g_setting.osd.element[OSD_GOGGLE_VRX_TEMP].position);
     osd_object_set_pos(is_fhd, g_osd_hdzero.latency_lock[is_fhd], &g_setting.osd.element[OSD_GOGGLE_LATENCY_LOCK].position);
     osd_object_set_pos(is_fhd, g_osd_hdzero.sd_rec[is_fhd], &g_setting.osd.element[OSD_GOGGLE_SD_REC].position);
